@@ -6,11 +6,10 @@ from users.user_controller import createUser, loginuser
 
 router = APIRouter()
 
-@router.post("/users/register", response_model=UserResponse)
-async def createuser(user: UserResponse , db: Session = Depends(get_session) ):
+@router.post("/user/signup", response_model=UserResponse, summary="Create an user",description="Using this endpoint to create an user here", tags=["User"])
+async def signup(user: UserResponse , db: Session = Depends(get_session) ):
     return createUser(db, user)
 
-@router.post("/user/login", response_model=loginresponse)
-async def loginUser(user: Userlogin, db:Session = Depends(get_session)):
-    # print(**user.dict())
+@router.post("/user/signin", response_model=loginresponse, summary="Login User", description="User can login here", tags=["User"])
+async def signin(user: Userlogin, db:Session = Depends(get_session)):
     return loginuser(db, user)
