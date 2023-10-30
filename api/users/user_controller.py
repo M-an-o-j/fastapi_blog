@@ -1,9 +1,6 @@
 from models import User
-from datetime import datetime, timedelta
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
-from Auth import hash_password, verify_password, authenticate_user, create_access_token
-from api.users.user_service import createuserservice, loginUserservice, updateUserservice, deleteUserservice
+from api.users.user_service import user_services
 from config import ACCESS_TOKEN_EXPIRY_MINUTES
 from jose import jwt
 
@@ -26,7 +23,7 @@ class user_controller:
             EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$")
             if not EMAIL_REGEX.match(user.email):
                   raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="email is not valid")
-            return createuserservice(db, user)
+            return user_services.createuserservice(db, user)
 
       def loginusercontroller(self,db, user):
             if user.username == "" and user.password == "":
@@ -36,7 +33,7 @@ class user_controller:
             if user.password == "":
                   raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="password is required")
             
-            return loginUserservice(db, user)
+            return user_services.loginUserservice(db, user)
             
       def updateUsercontroller(self,db, user,user_id, token):
             try:
@@ -54,7 +51,7 @@ class user_controller:
             if user.name == "" and user.username == "":
                   raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Any one field is required") 
             
-            return updateUserservice(db, user, id)
+            return user_services.updateUserservice(db, user, id)
             
       def deleteUsercontroller(self,db,token, user_id):
             try:
@@ -65,4 +62,4 @@ class user_controller:
             if user_id != id:
                   raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You can't delete this account")
             
-            return deleteUserservice(db, user_id)
+            return user_services.deleteUserservice(db, user_id)
