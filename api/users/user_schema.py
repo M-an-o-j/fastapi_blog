@@ -1,6 +1,15 @@
 from pydantic import BaseModel
+from typing import Optional
+import datetime
 
 class UserResponse(BaseModel):
+    name:str
+    username : str
+    password : str
+    email : str 
+    created_at: str
+
+class UserSignUp(BaseModel):
     name:str
     username : str
     password : str
@@ -16,5 +25,5 @@ class loginresponse(BaseModel):
     token_type:str
 
 class updateuserresponse(BaseModel):
-    name:str
-    username:str
+    name:Optional[str]
+    username:Optional[str]

@@ -11,6 +11,17 @@ class User(Base):
     password = Column(String)
     active = Column(Boolean, default=False)
     email = Column(String, unique=True)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
 
     blogs = relationship("Blog", back_populates="author")
+    logs = relationship("Signin_logs", back_populates="User_log" )
+
+class Signin_logs(Base):
+    __tablename__ = "Signin_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    Date_Time = Column(DateTime)
+
+
+    User_log = relationship(User, back_populates="logs")
