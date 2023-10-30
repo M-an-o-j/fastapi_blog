@@ -43,7 +43,10 @@ def updateBlogController(db, blog_id, blog, token):
         return updateblogservice(db, db_blog, blog)
 
 def deleteBlogController(db, blog_id, token):
-        user_id = jwt.decode(token, secret, algorithms=["HS256"])["sub"]
+        try:
+            user_id = jwt.decode(token, secret, algorithms=["HS256"])["sub"]
+        except Exception as e:
+              raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
         db_blog = db.query(Blog).filter(Blog.id == blog_id).first()
         if db_blog is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="blog not found")

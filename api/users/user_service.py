@@ -39,7 +39,7 @@ def loginUserservice(db, user):
 def updateUserservice(db,user, username):
         # username = jwt.decode(token, secret, algorithms=["HS256"])["sub"]
         print(username)
-        db_user = db.query(User).filter(User.username == username).first()
+        db_user = db.query(User).filter(User.id == username).first()
         print(db_user.username)
         if user.username is not None:
             db_user.username = user.username
@@ -47,13 +47,11 @@ def updateUserservice(db,user, username):
             db_user.name = user.name
         print(db_user.username)
 
-        access_token = create_access_token(data={"sub": user.username}, expires_delta=expiry_del)
 
         db.commit()
         return JSONResponse({
             "user":{
                  "name":db_user.name,
-                 "username":db_user.username,
-                 "access_token":access_token
+                 "username":db_user.username
             }
         })

@@ -3,7 +3,7 @@ from api.blogs.blog_schema import blogresponse, postblogresponse
 from sqlalchemy.orm import Session
 from Database import get_session
 from typing import List
-from api.blogs.blog_controller import getAllBlogsController, postBlogController, getSingleBlogController, updateBlogController
+from api.blogs.blog_controller import getAllBlogsController, postBlogController, getSingleBlogController, updateBlogController, deleteBlogController
 
 router = APIRouter()
 
@@ -22,3 +22,7 @@ async def post_Blog(blog:postblogresponse,token:str ,db: Session = Depends(get_s
 @router.put("/update_blog/{blog_id}", response_model=blogresponse, tags=["Blogs"])
 async def update_Blog(blog:postblogresponse ,token:str,blog_id:int,db: Session = Depends(get_session)):
     return updateBlogController(db, blog_id, blog, token)
+
+@router.delete("/delete_blog/{blog_id}", response_model=blogresponse, tags=["Blogs"])
+async def update_Blog(token:str,blog_id:int,db: Session = Depends(get_session)):
+    return deleteBlogController(db, blog_id, token)

@@ -64,5 +64,11 @@ def updateblogservice(db, db_blog, blog):
 
     return db_blog
 
-def deleteblogservice():
-    return
+def deleteblogservice(db, db_blog):
+    db.delete(db_blog)
+    db.commit()
+    return JSONResponse({
+        "status code":status.HTTP_200_OK,
+        "message":"Blog deleted succesfully"
+    })
+    
