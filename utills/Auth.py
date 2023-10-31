@@ -1,11 +1,12 @@
 from passlib.hash import bcrypt
 from passlib.context import CryptContext
-from models import User
 from datetime import datetime, timedelta
 from typing import Union
-from config import SECRET_KEY, ALGORITHM
-from jose import JWTError, jwt
+from api.users.user_model import *
+from jose import jwt
 from fastapi import HTTPException
+from configuration.config import SECRET_KEY
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -14,6 +15,7 @@ def hash_password(password: str):
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
 def get_user(username: str, db):
     user_det = db.query(User).filter(User.username == username).first()
     if user_det is not None:
@@ -33,5 +35,5 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
     return encoded_jwt

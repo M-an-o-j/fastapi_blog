@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column , String, Integer, Float, Boolean, ForeignKey, DateTime
-from Database import Base
+from configuration.Database import Base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from api.users.user_model import User
@@ -15,4 +15,4 @@ class Blog(Base):
     created_at = Column(DateTime, default=datetime.now())
     
 
-    author = relationship(User, back_populates="blogs")
+    author = relationship("User", back_populates="blogs")
