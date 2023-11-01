@@ -4,8 +4,12 @@ from datetime import datetime, timedelta
 from typing import Union
 from api.users.user_model import *
 from jose import jwt
-from fastapi import HTTPException
-from configuration.config import SECRET_KEY
+from fastapi import HTTPException, Request
+import time
+
+ACCESS_TOKEN_EXPIRY_MINUTES = 30
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ALGORITHM = "HS256"
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -37,3 +41,17 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
     return encoded_jwt
+
+def decode_token(token):
+    decode_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+    print(decode_token)
+    expires = decode_token.get("exp")
+    if expires >= time.time():
+        return str(decode_token)
+    
+def decode_token_id(token):
+    decode_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])['sub']
+    return int(decode_token)
+    
+def get_authorization_header(request: Request):
+    return request.headers.get("Authorization")

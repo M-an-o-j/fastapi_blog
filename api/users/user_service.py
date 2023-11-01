@@ -1,8 +1,7 @@
-from utills.Auth import hash_password, authenticate_user, create_access_token
+from utills.auth_handler import *
 from fastapi.responses import JSONResponse
 from api.users.user_model import *
 import datetime
-from configuration.config import *
 
 expiry_del = ACCESS_TOKEN_EXPIRY_MINUTES
 
@@ -10,7 +9,7 @@ class user_services:
     def createuserservice(self,db, user):
             hashed_passowrd = hash_password(user.password)
             user.password = hashed_passowrd
-            db_users = User(**user.dict(), created_at = datetime.datetime.now())
+            db_users = User(**user.dict(), created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             print(db_users)
             db.add(db_users)
             db.commit()
@@ -78,4 +77,10 @@ class user_services:
         return JSONResponse({
                 "message": "account deleted succesfully"
         })
+    
+    def userprofileservice(self, db, user_id):
+          db_user = db.query(User).get(user_id)
+
+          return db_user
+          
     

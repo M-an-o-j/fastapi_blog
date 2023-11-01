@@ -1,10 +1,10 @@
-from fastapi import HTTPException, status
 from api.users.user_service import *
 from jose import jwt
 import re
 from configuration.config import *
 from utills.error import error
 from api.users.user_service import *
+from utills.auth_handler import *
 
 secret = SECRET_KEY
 
@@ -41,10 +41,6 @@ class user_controller:
             return services.loginUserservice(db, user)
       
       def logoutusercontroller(self,db,user_id,token):
-            try:
-                  id = jwt.decode(token, secret, algorithms=["HS256"])["sub"]
-            except Exception as e:
-                  error(401,"Invalid token")
 
             db_user = db.query(User).filter(User.id == user_id).first()
             if db_user.is_active == False:
@@ -55,13 +51,8 @@ class user_controller:
 
             return services.logoutUserservice(db,id)
             
-      def updateUsercontroller(self,db, user,user_id, token):
+      def updateUsercontroller(self,db, user,user_id):
             db_user = db.query(User).filter(User.id == user_id).first()
-
-            try:
-                  id = jwt.decode(token, secret, algorithms=["HS256"])["sub"]
-            except Exception as e:
-                  error(401,"Invalid token")
             
             if db_user is None:
                   error(404,"User not found")           
@@ -72,14 +63,14 @@ class user_controller:
             
             return services.updateUserservice(db, user, id)
             
-      def deleteUsercontroller(self,db,token, user_id):
-            try:
-                  id = jwt.decode(token, secret, algorithms=["HS256"])["sub"]
-                  print("jwt id",id)
-            except Exception as e:
-                  error(401, "Invalid token")
-            
+      def deleteUsercontroller(self,db, user_id):            
             if user_id != int(id):
                   error(401, "You can't delete this account")
             
             return services.deleteUserservice(db, user_id)
+      
+      def userProfilecontroller(self,db, user_id, Auth_head):      
+            id = decode_token_id(Auth_head.split("Bearer")[1].strip())
+            if id != user_id:
+                  error(400, "You can't fetch anothe user profile")
+            return services.userprofileservice(db, user_id)

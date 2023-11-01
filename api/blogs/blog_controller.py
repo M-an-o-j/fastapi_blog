@@ -4,7 +4,7 @@ from jose import jwt
 from typing import List
 from api.blogs.blog_service import *
 from utills.error import *
-from configuration.config import *
+from utills.auth_handler import *
 
 secret = SECRET_KEY
 
