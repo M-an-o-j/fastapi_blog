@@ -46,6 +46,10 @@ class user_controller:
             except Exception as e:
                   error(401,"Invalid token")
 
+            db_user = db.query(User).filter(User.id == user_id).first()
+            if db_user.is_active == False:
+                  error(401,"you are not logged in ")
+
             if user_id != int(id):
                   error(401, "You can't delete this account")   
 

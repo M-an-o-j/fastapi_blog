@@ -23,3 +23,5 @@ async def updateuser(user_id:int,db:Session = Depends(get_session), token=str):
 @router.post("/logout/{user_id}", response_model=updateuserresponse, summary="logout User", description="User can logout in this endpoint", tags=["User"] )
 async def updateuser(user_id:int,db:Session = Depends(get_session), token=str):
     return controller.logoutusercontroller(db,user_id,token)
+
+

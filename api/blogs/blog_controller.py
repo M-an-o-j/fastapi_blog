@@ -11,8 +11,8 @@ secret = SECRET_KEY
 service = blog_services
 
 class blog_controller:
-    def getAllBlogsController(db):
-            return service.getAllBlogsservice(db)
+    def getAllBlogsController(db, limit, skip):
+            return service.getAllBlogsservice(db, limit, skip)
         
 
     def postBlogController(db, blog, token):
@@ -36,6 +36,14 @@ class blog_controller:
                 error(404, "Blog not found")
 
             return service.getsingleblogservice(db, db_blog)
+            
+    def getUserBlogsController(db, user_id):
+            db_blogs = db.query(Blog).filter(Blog.author_id == user_id).all()
+            print(db_blogs)
+            if db_blogs == []:
+                error(404, "User didn't wrote any blogs")
+
+            return service.getuserblogsservice(db, db_blogs)
 
     def updateBlogController(db, blog_id, blog, token):
             user_id = jwt.decode(token, secret, algorithms=["HS256"])["sub"]

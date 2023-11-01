@@ -5,11 +5,11 @@ from api.users.user_model import User
 from fastapi.responses import JSONResponse
 
 class blog_services:
-    def getAllBlogsservice(db):
+    def getAllBlogsservice(db, limit, skip):
         try:
             db_blogs = db.query(Blog).all()
-            print(db_blogs)
-            return db_blogs
+            Blogs = db_blogs[skip:skip+limit]
+            return Blogs
         except Exception as e:
             print(e)
             raise HTTPException(
@@ -49,6 +49,9 @@ class blog_services:
                 "author": author_name
             }
         })
+    
+    def getuserblogsservice(db, db_blogs):
+         return db_blogs
 
     def updateblogservice(db, db_blog, blog):
         if blog.title != "":
