@@ -34,7 +34,8 @@ class validations:
             else:
                 return False
         
-        def null_validation(self,*args):
+        def None_validation(self,*args):
             for i in args:
                 if i == None:
                     return True
+                

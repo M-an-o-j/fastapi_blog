@@ -11,7 +11,7 @@ user_validation = validations.User_validations()
 
 class user_controller:
       def createUsercontroller(self,db, user):
-            if user_validation.null_error_handler(user.name, user.username, user.password, user.email):
+            if user_validation.None_validation(user.name, user.username, user.password, user.email):
                   return errorhandler(400, "All field is required")
             if user_validation.empty_validation(user) == False:
                   return errorhandler(400, "All field is required")            
@@ -22,7 +22,7 @@ class user_controller:
             return services.createuserservice(db, user)
 
       def loginusercontroller(self,db, user):
-            if user_validation.null_validation(user.username, user.password):
+            if user_validation.None_validation(user.username, user.password):
                   return errorhandler(400,"All field is required")
             db_user = filter_items(db,User,User.username, user.username).first()
             if db_user:
@@ -33,14 +33,16 @@ class user_controller:
             return services.loginUserservice(db, user)
       
       def logoutusercontroller(self,db,Auth_head):
-            id = decode_token_id(Auth_head)
+            id = decode_token_id(Auth_head,db)
             db_user = filter_items(db,User,User.id,id).first()
+            if user_validation.User_delete_validation(db_user):
+                  errorhandler(404,"User not found") 
             if not user_validation.login_validation(db_user):
                   errorhandler(401,"You can't logout unless loggedin")
             return services.logoutUserservice(db,id)
             
       def updateUsercontroller(self,db, user, Auth_head):
-            id = decode_token_id(Auth_head)
+            id = decode_token_id(Auth_head,db)
             db_user = filter_items(db,User,User.id,id).first()            
             if user_validation.User_delete_validation(db_user):
                   errorhandler(404,"User not found")          
@@ -49,11 +51,15 @@ class user_controller:
             return services.updateUserservice(db, user, id)
             
       def deleteUsercontroller(self,db, Auth_head):            
-            id = decode_token_id(Auth_head)
+            id = decode_token_id(Auth_head,db)
             db_user = db.query(User).get(id)
             if not user_validation.login_validation(db_user):
                   errorhandler(401, "You have to login to delete your account")
             return services.deleteUserservice(db, id)
       
-      def userProfilecontroller(self,db,Auth_head):      
-            return services.userprofileservice(db, Auth_head)
+      def userProfilecontroller(self,db,Auth_head):
+            id = decode_token_id(Auth_head,db)
+            db_user = db.query(User).get(id)  
+            if user_validation.User_delete_validation(db_user):
+                  errorhandler(404,"User not found")      
+            return services.userprofileservice(db, db_user)

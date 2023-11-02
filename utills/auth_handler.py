@@ -1,4 +1,3 @@
-from passlib.hash import bcrypt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Union
@@ -48,9 +47,13 @@ def decode_token(token):
     if expires >= time.time():
         return str(decode_token)
     
-def decode_token_id(token):
-    print(token)
+def decode_token_id(token, db = None):
     decode_token = jwt.decode(token.split("Bearer")[1].strip(), SECRET_KEY, algorithms=["HS256"])['sub']
+    if db != None:
+        tok = db.query(Token).filter(Token.token == token.split("Bearer")[1].strip()).first()
+        print(tok)
+        if tok == None:
+            raise HTTPException(status_code=401, detail="Token is expired")
     return int(decode_token)
     
 def get_authorization_header(request: Request):

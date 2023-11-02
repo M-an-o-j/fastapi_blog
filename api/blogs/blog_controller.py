@@ -31,7 +31,7 @@ class blog_controller:
             return service.getsingleblogservice(db, db_blog)
             
     def getUserBlogsController(db, Auth_head):
-            user_id = decode_token_id(Auth_head)
+            user_id = decode_token_id(Auth_head,db)
             db_blogs = filter_items(db,Blog,Blog.author_id,user_id).all()
             if db_blogs == []:
                 errorhandler(404, "User didn't wrote any blogs")

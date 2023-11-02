@@ -29,11 +29,13 @@ class user_services:
             db_user = authenticate_user(db,user.username, user.password)
             db_user.is_active = True
             signin_log = Signin_logs(user_id= db_user.id, logged_in = datetime.datetime.now())
+            access_token = create_access_token(data={"sub": str(db_user.id)}, expires_delta=expiry_del)
+            db_token = Token(user_id= db_user.id, token=access_token)
             db.add(db_user)
             db.add(signin_log)
+            db.add(db_token)
             db.commit()
             
-            access_token = create_access_token(data={"sub": str(db_user.id)}, expires_delta=expiry_del)
             return JSONResponse({
                 "message":"User loggedin successfully",
                 "user":{
@@ -49,7 +51,9 @@ class user_services:
           last_login_id = max(signin_user_ids)
           last_login = db.query(Signin_logs).filter(Signin_logs.id == last_login_id).first()
           last_login.logged_out = datetime.datetime.now()
+          db_token = filter_items(db,Token,Token.user_id,User_id).first()
           db.add(last_login)
+          db.delete(db_token)
           db.commit()
           return JSONResponse({
                 "message":"logged out"
@@ -57,9 +61,9 @@ class user_services:
 
     def updateUserservice(self,db,user, username):
             db_user = db.query(User).filter(User.id == username).first()
-            if user.username != "" and user.username != "null":
+            if user.username != "" and user.username != None:
                 db_user.username = user.username
-            if user.name != "" and user.name != "null":   
+            if user.name != "" and user.name != None:   
                 db_user.name = user.name
             print(db_user.username)
             db_user.updated_at = datetime.datetime.now()
@@ -80,10 +84,7 @@ class user_services:
                 "message": "account deleted succesfully"
         })
     
-    def userprofileservice(self, db, Auth_head):
-          id = decode_token_id(Auth_head)
-          db_user = db.query(User).get(id)
-
+    def userprofileservice(self, db, db_user):
           return db_user
           
     
