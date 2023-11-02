@@ -34,8 +34,7 @@ class user_services:
             db.add(db_user)
             db.add(signin_log)
             db.add(db_token)
-            db.commit()
-            
+            db.commit()           
             return JSONResponse({
                 "message":"User loggedin successfully",
                 "user":{
@@ -43,13 +42,12 @@ class user_services:
                     "access_token": access_token, 
                     "token_type": "bearer"}
                 })
+    
     def logoutUserservice(self,db, User_id):
           db_user = db.query(User).filter(User.id == User_id).first()
           db_user.is_active = False
           signin_user = db.query(Signin_logs).filter(Signin_logs.user_id == User_id).all()
-          signin_user_ids = [i.id for i in signin_user]
-          last_login_id = max(signin_user_ids)
-          last_login = db.query(Signin_logs).filter(Signin_logs.id == last_login_id).first()
+          last_login = db.query(Signin_logs).filter(Signin_logs.id == max([i.id for i in signin_user])).first()
           last_login.logged_out = datetime.datetime.now()
           db_token = filter_items(db,Token,Token.user_id,User_id).first()
           db.add(last_login)
@@ -79,7 +77,6 @@ class user_services:
         db_user = db.query(User).get(user_id)
         db_user.is_deleted = True
         db.commit()
-
         return JSONResponse({
                 "message": "account deleted succesfully"
         })
