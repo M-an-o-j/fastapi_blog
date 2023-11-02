@@ -6,3 +6,4 @@ def errorhandler(status_code, message):
 
 def filter_items(db,model, model_attribute, value):
     return db.query(model).filter(model_attribute == value)
+

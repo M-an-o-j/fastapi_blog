@@ -1,6 +1,7 @@
 import re
 
 class validations:
+
     class User_validations:
 
         def email_validations(self, email):
@@ -32,3 +33,8 @@ class validations:
                 return True
             else:
                 return False
+        
+        def null_validation(self,*args):
+            for i in args:
+                if i == None:
+                    return True

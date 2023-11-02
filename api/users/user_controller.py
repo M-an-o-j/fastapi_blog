@@ -1,7 +1,4 @@
 from api.users.user_service import *
-from jose import jwt
-import re
-from configuration.config import *
 from utills.handlers import *
 from api.users.user_service import *
 from utills.auth_handler import *
@@ -14,6 +11,8 @@ user_validation = validations.User_validations()
 
 class user_controller:
       def createUsercontroller(self,db, user):
+            if user_validation.null_error_handler(user.name, user.username, user.password, user.email):
+                  return errorhandler(400, "All field is required")
             if user_validation.empty_validation(user) == False:
                   return errorhandler(400, "All field is required")            
             if not user_validation.password_validation(user.password):
@@ -23,6 +22,8 @@ class user_controller:
             return services.createuserservice(db, user)
 
       def loginusercontroller(self,db, user):
+            if user_validation.null_validation(user.username, user.password):
+                  return errorhandler(400,"All field is required")
             db_user = filter_items(db,User,User.username, user.username).first()
             if db_user:
                   if user_validation.User_delete_validation(db_user):
@@ -50,7 +51,7 @@ class user_controller:
       def deleteUsercontroller(self,db, Auth_head):            
             id = decode_token_id(Auth_head)
             db_user = db.query(User).get(id)
-            if not user_validation.User_delete_validation(db_user):
+            if not user_validation.login_validation(db_user):
                   errorhandler(401, "You have to login to delete your account")
             return services.deleteUserservice(db, id)
       

@@ -9,14 +9,14 @@ class UserResponse(BaseModel):
     created_at: datetime
 
 class UserSignUp(BaseModel):
-    name:str
-    username : str
-    password : str
-    email : str 
+    name:str = None
+    username : str = None
+    password : str = None
+    email : str = None
 
 class Userlogin(BaseModel):
-    username: str
-    password: str
+    username: str = None
+    password: str = None
 
 class loginresponse(BaseModel):
     username:str
@@ -24,5 +24,5 @@ class loginresponse(BaseModel):
     token_type:str
 
 class updateuserresponse(BaseModel):
-    name:Optional[str]
-    username:Optional[str]
+    name:str = None
+    username:str = None

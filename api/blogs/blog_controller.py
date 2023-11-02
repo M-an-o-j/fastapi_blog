@@ -1,7 +1,4 @@
-from fastapi import HTTPException, status
 from api.blogs.blog_model import Blog
-from jose import jwt
-from typing import List
 from api.blogs.blog_service import *
 from utills.handlers import *
 from utills.auth_handler import *
@@ -33,8 +30,9 @@ class blog_controller:
 
             return service.getsingleblogservice(db, db_blog)
             
-    def getUserBlogsController(db, user_id):
-            db_blogs = db.query(Blog).filter(Blog.author_id == user_id).all()
+    def getUserBlogsController(db, Auth_head):
+            user_id = decode_token_id(Auth_head)
+            db_blogs = filter_items(db,Blog,Blog.author_id,user_id).all()
             if db_blogs == []:
                 errorhandler(404, "User didn't wrote any blogs")
 
@@ -42,7 +40,8 @@ class blog_controller:
 
     def updateBlogController(db, blog_id, blog, Auth_head):
             id = decode_token_id(Auth_head)
-            db_blog = filter_items(db, Blog, Blog.id, blog_id)
+            db_blog = filter_items(db, Blog, Blog.id, blog_id).first()
+            print(db_blog.id)
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != id:
@@ -58,5 +57,5 @@ class blog_controller:
             if db_blog.author_id != user_id:
                 errorhandler(401, "You are not the author of this blog. so, you can't delete")
         
-            return service.deleteblogservice(db, db_blog)
+            return service.deleteblogservice(db, db_blog.id)
             

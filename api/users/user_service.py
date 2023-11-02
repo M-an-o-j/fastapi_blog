@@ -29,7 +29,6 @@ class user_services:
             db_user = authenticate_user(db,user.username, user.password)
             db_user.is_active = True
             signin_log = Signin_logs(user_id= db_user.id, logged_in = datetime.datetime.now())
-            print(signin_log)
             db.add(db_user)
             db.add(signin_log)
             db.commit()
@@ -58,9 +57,9 @@ class user_services:
 
     def updateUserservice(self,db,user, username):
             db_user = db.query(User).filter(User.id == username).first()
-            if user.username != "":
+            if user.username != "" and user.username != "null":
                 db_user.username = user.username
-            if user.name != "":   
+            if user.name != "" and user.name != "null":   
                 db_user.name = user.name
             print(db_user.username)
             db_user.updated_at = datetime.datetime.now()

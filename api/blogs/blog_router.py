@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import Depends, Query
 from api.blogs.blog_schema import *
 from sqlalchemy.orm import Session
 from configuration.Database import *
@@ -29,6 +29,6 @@ async def update_Blog(blog:updateblogresponse,blog_id:int,Auth_head:str = Depend
 async def delete_blog(blog_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
     return controller.deleteBlogController(db, blog_id, Auth_head)
 
-@router.get("/user_blogs/", response_model=List[blogresponse],dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can delete blog here")
-async def get_user_blogs(user_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
-    return controller.getUserBlogsController(db, user_id)
+@router.get("/my_blogs/", response_model=List[blogresponse],dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can delete blog here")
+async def get_user_blogs(Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
+    return controller.getUserBlogsController(db, Auth_head)
