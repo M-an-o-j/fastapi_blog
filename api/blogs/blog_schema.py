@@ -15,3 +15,8 @@ class postblogresponse(BaseModel):
     summary:str
     paragraph:str
     author_id:int
+
+class updateblogresponse(BaseModel):
+    title:str
+    summary:str
+    paragraph:str

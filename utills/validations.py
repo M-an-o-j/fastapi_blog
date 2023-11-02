@@ -18,7 +18,6 @@ class validations:
 
         def empty_validation(self, obj):
             for key, value in obj:
-                print(value)
                 if value == "":
                     return False
                 

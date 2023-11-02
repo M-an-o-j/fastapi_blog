@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query
-from api.blogs.blog_schema import blogresponse, postblogresponse
+from api.blogs.blog_schema import *
 from sqlalchemy.orm import Session
 from configuration.Database import *
 from typing import List
@@ -22,13 +22,13 @@ async def post_Blog(blog:postblogresponse,Auth_head:str = Depends(get_authorizat
     return controller.postBlogController(db, blog, Auth_head)
 
 @router.put("/update_blog/{blog_id}", response_model=blogresponse,dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can update blog here")
-async def update_Blog(blog:postblogresponse,blog_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
+async def update_Blog(blog:updateblogresponse,blog_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
     return controller.updateBlogController(db, blog_id, blog, Auth_head)
 
 @router.delete("/delete_blog/{blog_id}", response_model=blogresponse,dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can delete blog here")
-async def update_Blog(blog_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
+async def delete_blog(blog_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
     return controller.deleteBlogController(db, blog_id, Auth_head)
 
 @router.get("/user_blogs/", response_model=List[blogresponse],dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can delete blog here")
-async def update_Blog(user_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
+async def get_user_blogs(user_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
     return controller.getUserBlogsController(db, user_id)

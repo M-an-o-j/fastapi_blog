@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import  HTTPException, status
 from api.blogs.blog_model import Blog
-from jose import jwt
 from api.users.user_model import User
 from fastapi.responses import JSONResponse
+from utills.handlers import *
 
 class blog_services:
     def getAllBlogsservice(db, limit, skip):
@@ -17,36 +17,27 @@ class blog_services:
 
 
     def postblogservice(db, blog, user_id):
-        db_user = db.query(User).filter(User.id == user_id).first()
-
-        blog.author_id = db_user.id
-        db_blog = Blog(**blog.dict())
-        author_name = db.query(User).filter(User.id == db_blog.author_id).first()
-        db.add(db_blog)
-        db.commit()
-        db.refresh(db_blog)
-
-        return JSONResponse({
-            "message": "successfully posted blog",
-            "blog": {
-                "title": db_blog.title,
-                "summary": db_blog.summary,
-                "paragraph": db_blog.paragraph,
-                "author": author_name.username
-            }
-        })
+        try:
+            db_user = filter_items(db, User, User.id, user_id).first()
+            blog.author_id = db_user.id
+            db_blog = Blog(**blog.dict())
+            db.add(db_blog)
+            db.commit()
+            db.refresh(db_blog)
+            return db_blog
+        except Exception as e:
+            errorhandler(500, "Internal server error")
 
 
     def getsingleblogservice(db, db_blog):
-        author_name = db.query(User).filter(
-            User.id == db_blog.author_id).first().username
+        Author_name = filter_items(db,User,User.id,db_blog.author_id).first().username
         return JSONResponse({
             "message": "Fetched blog successfully",
             "blog": {
                 "title": db_blog.title,
                 "summary": db_blog.summary,
                 "paragraph": db_blog.paragraph,
-                "author": author_name
+                "author": Author_name
             }
         })
     

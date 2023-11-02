@@ -27,7 +27,7 @@ class blog_controller:
             return service.postblogservice(db, blog, user_id)
 
     def getSingleBlogController(db, blog_id):
-            db_blog = db.query(Blog).filter(Blog.id == blog_id).first()
+            db_blog = filter_items(db, Blog, Blog.id, blog_id).first()
             if db_blog is None:
                 errorhandler(404, "Blog not found")
 
@@ -42,21 +42,21 @@ class blog_controller:
 
     def updateBlogController(db, blog_id, blog, Auth_head):
             id = decode_token_id(Auth_head)
-            db_blog = db.query(Blog).filter(Blog.id == blog_id).first()
+            db_blog = filter_items(db, Blog, Blog.id, blog_id)
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != id:
-                errorhandler(401, "You are not author of this blog. so, you can't edit or update")
+                errorhandler(401, "You are not the author of this blog. so, you can't edit or update")
 
             return service.updateblogservice(db, db_blog, blog)
 
     def deleteBlogController(db, blog_id, Auth_head):
-            db_blog = db.query(Blog).filter(Blog.id == blog_id).first()
+            db_blog = filter_items(db,Blog,Blog.id,blog_id).first()
             user_id = decode_token_id(Auth_head)
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != user_id:
-                errorhandler(401, "You are not a author of this blog. so, you cant edit or update")
+                errorhandler(401, "You are not the author of this blog. so, you can't delete")
         
             return service.deleteblogservice(db, db_blog)
             
