@@ -23,7 +23,7 @@ class user_controller:
             return services.createuserservice(db, user)
 
       def loginusercontroller(self,db, user):
-            db_user = db.query(User).filter(User.username == user.username).first()
+            db_user = filter_items(db,User,User.username, user.username).first()
             if db_user:
                   if user_validation.User_delete_validation(db_user):
                         errorhandler(404, "User not found")
@@ -33,14 +33,14 @@ class user_controller:
       
       def logoutusercontroller(self,db,Auth_head):
             id = decode_token_id(Auth_head)
-            db_user = db.query(User).filter(User.id == id).first()
+            db_user = filter_items(db,User,User.id,id).first()
             if not user_validation.login_validation(db_user):
                   errorhandler(401,"You can't logout unless loggedin")
             return services.logoutUserservice(db,id)
             
       def updateUsercontroller(self,db, user, Auth_head):
             id = decode_token_id(Auth_head)
-            db_user = db.query(User).filter(User.id == id).first()            
+            db_user = filter_items(db,User,User.id,id).first()            
             if user_validation.User_delete_validation(db_user):
                   errorhandler(404,"User not found")          
             if user.name == "" and user.username == "":
