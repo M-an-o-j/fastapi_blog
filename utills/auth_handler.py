@@ -44,13 +44,13 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 def decode_token(token):
     decode_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-    print(decode_token)
     expires = decode_token.get("exp")
     if expires >= time.time():
         return str(decode_token)
     
 def decode_token_id(token):
-    decode_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])['sub']
+    print(token)
+    decode_token = jwt.decode(token.split("Bearer")[1].strip(), SECRET_KEY, algorithms=["HS256"])['sub']
     return int(decode_token)
     
 def get_authorization_header(request: Request):

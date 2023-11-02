@@ -2,75 +2,57 @@ from api.users.user_service import *
 from jose import jwt
 import re
 from configuration.config import *
-from utills.error import error
+from utills.handlers import *
 from api.users.user_service import *
 from utills.auth_handler import *
+from utills.validations import *
 
 secret = SECRET_KEY
 
 services = user_services()
+user_validation = validations.User_validations()
 
 class user_controller:
       def createUsercontroller(self,db, user):
-            if user.name == "" or user.username == "" or user.password == "" or user.email == "":
-                  error(400,"All field is required")
-            
-            PASSWORD_REGEX = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$")
-            if not PASSWORD_REGEX.match(user.password):
-                  error(400,"Password should contain 8 character, atleast 1 uppercase letter, atleast 1 lowercase letter, atleast 1 symbol")
-            
-            EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$")
-            if not EMAIL_REGEX.match(user.email):
-                  error(400,"Email is not valid")
-
+            if user_validation.empty_validation(user) == False:
+                  return errorhandler(400, "All field is required")            
+            if not user_validation.password_validation(user.password):
+                  errorhandler(400,"Password should contain 8 character, atleast 1 uppercase letter, atleast 1 lowercase letter, atleast 1 symbol")            
+            if not user_validation.email_validations(user.email):
+                  errorhandler(400,"Email is not valid")
             return services.createuserservice(db, user)
 
       def loginusercontroller(self,db, user):
-
             db_user = db.query(User).filter(User.username == user.username).first()
-
-            if db_user.is_deleted == True:
-                  error(404, "User not found")
-            if user.username == "" and user.password == "":
-                  error(400, "Username and password is required")
-            if user.username == "":
-                  error(400, "Username is required")
-            if user.password == "":
-                  error(400, "password is required")
-            
+            if db_user:
+                  if user_validation.User_delete_validation(db_user):
+                        errorhandler(404, "User not found")
+            if user_validation.empty_validation(user) == False:
+                  errorhandler(400, "Username and password is required") 
             return services.loginUserservice(db, user)
       
-      def logoutusercontroller(self,db,user_id,token):
-
-            db_user = db.query(User).filter(User.id == user_id).first()
-            if db_user.is_active == False:
-                  error(401,"you are not logged in ")
-
-            if user_id != int(id):
-                  error(401, "You can't delete this account")   
-
+      def logoutusercontroller(self,db,Auth_head):
+            id = decode_token_id(Auth_head)
+            db_user = db.query(User).filter(User.id == id).first()
+            if not user_validation.login_validation(db_user):
+                  errorhandler(401,"You can't logout unless loggedin")
             return services.logoutUserservice(db,id)
             
-      def updateUsercontroller(self,db, user,user_id):
-            db_user = db.query(User).filter(User.id == user_id).first()
-            
-            if db_user is None:
-                  error(404,"User not found")           
-            if user_id != int(id):
-                  error(401, "You can't update this account")           
+      def updateUsercontroller(self,db, user, Auth_head):
+            id = decode_token_id(Auth_head)
+            db_user = db.query(User).filter(User.id == id).first()            
+            if user_validation.User_delete_validation(db_user):
+                  errorhandler(404,"User not found")          
             if user.name == "" and user.username == "":
-                  error(400, "Any one field is required")
-            
+                  errorhandler(400, "Any one field is required")            
             return services.updateUserservice(db, user, id)
             
-      def deleteUsercontroller(self,db, user_id):            
-            if user_id != int(id):
-                  error(401, "You can't delete this account")
-            
-            return services.deleteUserservice(db, user_id)
+      def deleteUsercontroller(self,db, Auth_head):            
+            id = decode_token_id(Auth_head)
+            db_user = db.query(User).get(id)
+            if not user_validation.User_delete_validation(db_user):
+                  errorhandler(401, "You have to login to delete your account")
+            return services.deleteUserservice(db, id)
       
-      def userProfilecontroller(self,db, user_id, Auth_head):      
-            id = decode_token_id(Auth_head.split("Bearer")[1].strip())
-            if id != user_id:
-                  error(400, "You can't fetch anothe user profile")
-            return services.userprofileservice(db, user_id)
+      def userProfilecontroller(self,db,Auth_head):      
+            return services.userprofileservice(db, Auth_head)

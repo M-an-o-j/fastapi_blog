@@ -2,6 +2,7 @@ from utills.auth_handler import *
 from fastapi.responses import JSONResponse
 from api.users.user_model import *
 import datetime
+from utills.handlers import *
 
 expiry_del = ACCESS_TOKEN_EXPIRY_MINUTES
 
@@ -16,7 +17,12 @@ class user_services:
             db.refresh(db_users)
             return JSONResponse({
                 "message":f"Signed Up successfully",
-                "Greetings":f"Welcome {db_users.username}"
+                "Greetings":f"Welcome {db_users.username}",
+                "user":{
+                      "name":db_users.name,
+                      "username":db_users.username,
+                      "email":db_users.email
+                }
             })
 
     def loginUserservice(self,db, user):
@@ -51,13 +57,10 @@ class user_services:
           })
 
     def updateUserservice(self,db,user, username):
-            print(username)
             db_user = db.query(User).filter(User.id == username).first()
-            print(db_user.created_at)
-            print(db_user.username)
-            if user.username is not None:
+            if user.username != "":
                 db_user.username = user.username
-            if user.name is not None:   
+            if user.name != "":   
                 db_user.name = user.name
             print(db_user.username)
             db_user.updated_at = datetime.datetime.now()
@@ -78,8 +81,9 @@ class user_services:
                 "message": "account deleted succesfully"
         })
     
-    def userprofileservice(self, db, user_id):
-          db_user = db.query(User).get(user_id)
+    def userprofileservice(self, db, Auth_head):
+          id = decode_token_id(Auth_head)
+          db_user = db.query(User).get(id)
 
           return db_user
           

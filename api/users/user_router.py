@@ -15,21 +15,20 @@ async def signup(user: UserSignUp , db: Session = Depends(get_session) ):
 async def signin(user: Userlogin, db:Session = Depends(get_session)):
     return controller.loginusercontroller(db, user)
 
-@router.put("/update/{user_id}", response_model=updateuserresponse,dependencies = [Depends(httpbearer)], summary="Update User", description="User can update their details in this endpoint", tags=["User"] )
-async def updateuser(user_id:int,user: updateuserresponse, db:Session = Depends(get_session), token=str):
-    return controller.updateUsercontroller(db, user,user_id, token)
+@router.put("/update/", response_model=updateuserresponse,dependencies = [Depends(httpbearer)], summary="Update User", description="User can update their details in this endpoint", tags=["User"] )
+async def updateuser(user: updateuserresponse,Auth_head:str = Depends(get_authorization_header), db:Session = Depends(get_session)):
+    return controller.updateUsercontroller(db, user,Auth_head)
 
-@router.delete("/delete/{user_id}", response_model=updateuserresponse,dependencies = [Depends(httpbearer)], summary="Delete User", description="User can delete their account in this endpoint", tags=["User"] )
-async def updateuser(user_id:int,db:Session = Depends(get_session), token=str):
-    return controller.deleteUsercontroller(db,token, user_id)
+@router.delete("/delete/", response_model=updateuserresponse,dependencies = [Depends(httpbearer)], summary="Delete User", description="User can delete their account in this endpoint", tags=["User"] )
+async def updateuser(Auth_head:str = Depends(get_authorization_header),db:Session = Depends(get_session)):
+    return controller.deleteUsercontroller(db, Auth_head)
 
-@router.post("/logout/{user_id}", response_model=updateuserresponse,dependencies = [Depends(httpbearer)], summary="logout User", description="User can logout in this endpoint", tags=["User"] )
-async def updateuser(user_id:int,db:Session = Depends(get_session)):
-    return controller.logoutusercontroller(db,user_id)
+@router.post("/logout/", response_model=updateuserresponse,dependencies = [Depends(httpbearer)], summary="logout User", description="User can logout in this endpoint", tags=["User"] )
+async def updateuser(Auth_head:str = Depends(get_authorization_header),db:Session = Depends(get_session)):
+    return controller.logoutusercontroller(db,Auth_head)
 
-@router.post("/my_profile/{user_id}", response_model=UserResponse,dependencies = [Depends(httpbearer)] ,summary="user profile", description="user can see their own profile here", tags=["User"] )
-async def updateuser(user_id:int, Auth_head:str = Depends(get_authorization_header),db:Session = Depends(get_session)):
-    print(Auth_head)
-    return controller.userProfilecontroller(db, user_id, Auth_head)
+@router.post("/my_profile/", response_model=UserResponse,dependencies = [Depends(httpbearer)] ,summary="user profile", description="user can see their own profile here", tags=["User"] )
+async def updateuser( Auth_head:str = Depends(get_authorization_header),db:Session = Depends(get_session)):
+    return controller.userProfilecontroller(db, Auth_head)
 
 
