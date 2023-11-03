@@ -27,7 +27,7 @@ async def updateuser(Auth_head:str = Depends(get_authorization_header),db:Sessio
 async def updateuser(Auth_head:str = Depends(get_authorization_header),db:Session = Depends(get_session)):
     return controller.logoutusercontroller(db,Auth_head)
 
-@router.post("/my_profile/", response_model=UserResponse,dependencies = [Depends(httpbearer)] ,summary="user profile", description="user can see their own profile here", tags=["User"] )
+@router.get("/my_profile/", response_model=UserResponse,dependencies = [Depends(httpbearer)] ,summary="user profile", description="user can see their own profile here", tags=["User"] )
 async def updateuser( Auth_head:str = Depends(get_authorization_header),db:Session = Depends(get_session)):
     return controller.userProfilecontroller(db, Auth_head)
 

@@ -75,7 +75,7 @@ class user_controller:
             # Taking apart the id from the token            
             id = decode_token_id(Auth_head,db)
             # Fetching the user object using filter_item function
-            db_user = filter_items(db,User,User.id == id).first()
+            db_user = filter_items(db,User,User.id,id).first()
             # Validate the user is deleted or not  
             if not user_validation.login_validation(db_user):
                   errorhandler(401, "You have to login to delete your account")
@@ -85,7 +85,7 @@ class user_controller:
       def userProfilecontroller(self,db,Auth_head):
             id = decode_token_id(Auth_head,db)
             # Fetching the user object using filter_item function
-            db_user = filter_items(db,User,User.id == id).first()
+            db_user = filter_items(db,User,User.id,id).first()
             # Validate the user is deleted or not  
             if user_validation.User_delete_validation(db_user):
                   errorhandler(404,"User not found")   

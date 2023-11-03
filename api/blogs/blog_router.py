@@ -21,7 +21,7 @@ async def get_Single_blog(blog_id:int,db: Session = Depends(get_session)):
 async def post_Blog(blog:postblogresponse,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
     return controller.postBlogController(db, blog, Auth_head)
 
-@router.put("/update_blog/{blog_id}", response_model=blogresponse,dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can update blog here")
+@router.put("/update_blog/{blog_id}", response_model=updateblogresponse,dependencies = [Depends(httpbearer)], tags=["Blogs"], summary="You can update blog here")
 async def update_Blog(blog:updateblogresponse,blog_id:int,Auth_head:str = Depends(get_authorization_header),db: Session = Depends(get_session)):
     return controller.updateBlogController(db, blog_id, blog, Auth_head)
 

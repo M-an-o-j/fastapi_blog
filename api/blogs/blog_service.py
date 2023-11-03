@@ -46,11 +46,11 @@ class blog_services:
          return db_blogs
 
     def updateblogservice(db, db_blog, blog):
-        if blog.title != "":
+        if blog.title != "" and blog.title != None:
             db_blog.title = blog.title
-        if blog.summary != "":
+        if blog.summary != "" and blog.summary != None:
             db_blog.summary = blog.summary
-        if blog.paragraph != "":
+        if blog.paragraph != "" and blog.paragraph != None:
             db_blog.paragraph = blog.paragraph
         db_blog.updated_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         db.commit()

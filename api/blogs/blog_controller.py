@@ -15,6 +15,8 @@ class blog_controller:
         
 
     def postBlogController(db, blog, Auth_head):
+            if validation.None_validation(blog.title, blog.summary, blog.paragraph, blog.author_id):
+                  errorhandler(400, "All field is required")
             if validation.empty_validation(blog) == False:
                 errorhandler(400, "All field are required")
             if len(blog.title) > 20:
@@ -39,9 +41,8 @@ class blog_controller:
             return service.getuserblogsservice(db, db_blogs)
 
     def updateBlogController(db, blog_id, blog, Auth_head):
-            id = decode_token_id(Auth_head)
+            id = decode_token_id(Auth_head, db)
             db_blog = filter_items(db, Blog, Blog.id, blog_id).first()
-            print(db_blog.id)
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != id:
@@ -51,7 +52,7 @@ class blog_controller:
 
     def deleteBlogController(db, blog_id, Auth_head):
             db_blog = filter_items(db,Blog,Blog.id,blog_id).first()
-            user_id = decode_token_id(Auth_head)
+            user_id = decode_token_id(Auth_head,db)
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != user_id:
