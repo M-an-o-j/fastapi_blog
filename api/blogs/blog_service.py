@@ -12,10 +12,7 @@ class blog_services:
             Blogs = db_blogs[skip:skip+limit]
             return Blogs
         except Exception as e:
-            print(e)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Internal server error")
-
+            errorhandler(400,"INternal server error")
 
     def postblogservice(db, blog, user_id):
         try:
@@ -59,9 +56,7 @@ class blog_services:
 
     def deleteblogservice(db, blog_id):
         db_blog = db.query(Blog).get(blog_id)
-        print(db_blog.is_deleted)
         db_blog.is_delete = True
-        print(db_blog.is_deleted)
         db.commit()
         return JSONResponse({
             "status code":status.HTTP_200_OK,
