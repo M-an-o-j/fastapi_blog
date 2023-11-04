@@ -6,7 +6,7 @@ from typing import List
 from api.blogs.blog_controller import *
 from utills.auth_bearer import *
 
-controller = blog_controller
+controller = blog_controller(Blog)
 httpbearer = AdminJWT()
 
 @router.get("/blogs/", response_model=List[blogresponse], summary="you can get all blogs here",tags=["Blogs"])

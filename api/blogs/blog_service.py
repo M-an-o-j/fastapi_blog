@@ -6,17 +6,22 @@ from utills.handlers import *
 import datetime
 
 class blog_services:
-    def getAllBlogsservice(db, limit, skip):
+
+    def __init__(self, Blog, User):
+        self.blog = Blog
+        self.user = User
+
+    def getAllBlogsservice(self,db, limit, skip):
         try:
-            db_blogs = db.query(Blog).all()
+            db_blogs = db.query(self.blog).all()
             Blogs = db_blogs[skip:skip+limit]
             return Blogs
         except Exception as e:
             errorhandler(400,"INternal server error")
 
-    def postblogservice(db, blog, user_id):
+    def postblogservice(self,db, blog, user_id):
         try:
-            db_user = filter_items(db, User, User.id, user_id).first()
+            db_user = filter_items(db, self.user, self.user.id, user_id).first()
             blog.author_id = db_user.id
             db_blog = Blog(**blog.dict(),created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             db.add(db_blog)
@@ -27,8 +32,8 @@ class blog_services:
             errorhandler(500, f"Internal server error {e}")
 
 
-    def getsingleblogservice(db, db_blog):
-        Author_name = filter_items(db,User,User.id,db_blog.author_id).first().username
+    def getsingleblogservice(self,db, db_blog):
+        Author_name = filter_items(db,self.user,self.user.id,db_blog.author_id).first().username
         return JSONResponse({
             "message": "Fetched blog successfully",
             "blog": {
@@ -39,7 +44,7 @@ class blog_services:
             }
         })
     
-    def getuserblogsservice(db, db_blogs):
+    def getuserblogsservice(self,db, db_blogs):
          return db_blogs
 
     def updateblogservice(db, db_blog, blog):
@@ -54,8 +59,8 @@ class blog_services:
 
         return db_blog
 
-    def deleteblogservice(db, blog_id):
-        db_blog = db.query(Blog).get(blog_id)
+    def deleteblogservice(self,db, blog_id):
+        db_blog = db.query(self.blog).get(blog_id)
         db_blog.is_delete = True
         db.commit()
         return JSONResponse({

@@ -53,8 +53,10 @@ class user_services:
           try:
                 db_user = db.query(User).filter(User.id == User_id).first()
                 db_user.is_active = False
-                signin_user = db.query(Signin_logs).filter(Signin_logs.user_id == User_id).all()
-                last_login = db.query(Signin_logs).filter(Signin_logs.id == max([i.id for i in signin_user])).first()
+                signin_user = filter_items(db,Signin_logs,Signin_logs.user_id,User_id).all()
+                list_signin = [i.id for i in signin_user]
+                last_login_id = max(list_signin)
+                last_login = filter_items(db,Signin_logs, Signin_logs.id,last_login_id).first()
                 last_login.logged_out = datetime.datetime.now()
                 db_token = filter_items(db,Token,Token.user_id,User_id).first()
                 db.add(last_login)

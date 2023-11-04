@@ -1,62 +1,60 @@
-from api.blogs.blog_model import Blog
 from api.blogs.blog_service import *
 from utills.handlers import *
 from utills.auth_handler import *
 from utills.validations import *
 
-secret = SECRET_KEY
+class blog_controller(Validations,blog_services):
 
-service = blog_services
-validation = validations.User_validations()
+    def __init__(self, model):
+          super().__init__(Blog, User)
+          self.model = model
 
-class blog_controller:
-    def getAllBlogsController(db, limit, skip):
-            return service.getAllBlogsservice(db, limit, skip)
+    def getAllBlogsController(self,db, limit, skip):
+            return super().getAllBlogsservice(db, limit, skip)
         
-
-    def postBlogController(db, blog, Auth_head):
-            if validation.None_validation(blog.title, blog.summary, blog.paragraph, blog.author_id):
+    def postBlogController(self,db, blog, Auth_head):
+            if super().None_validation(blog.title, blog.summary, blog.paragraph, blog.author_id):
                   errorhandler(400, "All field is required")
-            if validation.empty_validation(blog) == False:
+            if super().empty_validation(blog) == False:
                 errorhandler(400, "All field are required")
             if len(blog.title) > 20:
                 errorhandler(400,"Title should not exceed 20 characters")
             user_id = decode_token_id(Auth_head)
             
-            return service.postblogservice(db, blog, user_id)
+            return super().postblogservice(db, blog, user_id)
 
-    def getSingleBlogController(db, blog_id):
-            db_blog = filter_items(db, Blog, Blog.id, blog_id).first()
+    def getSingleBlogController(self,db, blog_id):
+            db_blog = filter_items(db, self.model, self.model.id, blog_id).first()
             if db_blog is None:
                 errorhandler(404, "Blog not found")
 
-            return service.getsingleblogservice(db, db_blog)
+            return super().getsingleblogservice(db, db_blog)
             
-    def getUserBlogsController(db, Auth_head):
+    def getUserBlogsController(self,db, Auth_head):
             user_id = decode_token_id(Auth_head,db)
-            db_blogs = filter_items(db,Blog,Blog.author_id,user_id).all()
+            db_blogs = filter_items(db,self.model,self.model.author_id,user_id).all()
             if db_blogs == []:
                 errorhandler(404, "User didn't wrote any blogs")
 
-            return service.getuserblogsservice(db, db_blogs)
+            return super().getuserblogsservice(db, db_blogs)
 
-    def updateBlogController(db, blog_id, blog, Auth_head):
+    def updateBlogController(self,db, blog_id, blog, Auth_head):
             id = decode_token_id(Auth_head, db)
-            db_blog = filter_items(db, Blog, Blog.id, blog_id).first()
+            db_blog = filter_items(db, self.model, self.model.id, blog_id).first()
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != id:
                 errorhandler(401, "You are not the author of this blog. so, you can't edit or update")
 
-            return service.updateblogservice(db, db_blog, blog)
+            return super().updateblogservice(db, db_blog, blog)
 
-    def deleteBlogController(db, blog_id, Auth_head):
-            db_blog = filter_items(db,Blog,Blog.id,blog_id).first()
+    def deleteBlogController(self,db, blog_id, Auth_head):
+            db_blog = filter_items(db,self.model,self.model.id,blog_id).first()
             user_id = decode_token_id(Auth_head,db)
             if db_blog is None:
                 errorhandler(404, "Blog not found")
             if db_blog.author_id != user_id:
                 errorhandler(401, "You are not the author of this blog. so, you can't delete")
         
-            return service.deleteblogservice(db, db_blog.id)
+            return super().deleteblogservice(db, db_blog.id)
             
