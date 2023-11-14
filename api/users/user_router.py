@@ -2,6 +2,7 @@ from api.users.user_schema import *
 from sqlalchemy.orm import Session
 from api.users.user_controller import *
 from utills.auth_bearer import * 
+from fastapi import UploadFile, File
 
 controller =  user_controller()
 
@@ -9,7 +10,13 @@ httpbearer = AdminJWT()
 
 @router.post("/signup", response_model=UserResponse, summary="Create an user",description="User can signup in this endpoint ", tags=["User"])
 async def signup(user: UserSignUp , db: Session = Depends(get_session) ):
-    return controller.createUsercontroller(db, user)
+    try:
+        return controller.createUsercontroller(db, user)
+    except ValidationError as e:
+        # Handle Pydantic validation errors
+        errors = e.errors()
+        error_msgs = [f"{error['loc'][1]}: {error['msg']}" for error in errors]
+        raise HTTPException(status_code=422, detail={"errors": error_msgs})
 
 @router.post("/signin", response_model=loginresponse, summary="Login User", description="User can login in this endpoint", tags=["User"])
 async def signin(user: Userlogin, db:Session = Depends(get_session)):

@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel ,ValidationError
 from datetime import datetime
 
 class UserResponse(BaseModel):

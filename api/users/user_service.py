@@ -1,8 +1,9 @@
 from utills.auth_handler import *
 from fastapi.responses import JSONResponse
 from api.users.user_model import *
-import datetime
+from datetime import datetime
 from utills.handlers import *
+from .user_schema import *
 
 expiry_del = ACCESS_TOKEN_EXPIRY_MINUTES
 
@@ -25,6 +26,9 @@ class user_services:
                         "email":db_users.email
                     }
                 })
+            except ValidationError as e:
+                for error in e.errors():
+                    errorhandler(422,f"{error['msg']}")
             except Exception as e:
                errorhandler(500, "Internal server error")
 
@@ -32,7 +36,7 @@ class user_services:
             try:
                 db_user = authenticate_user(db,user.username, user.password)
                 db_user.is_active = True
-                signin_log = Signin_logs(user_id= db_user.id, logged_in = datetime.datetime.now())
+                signin_log = Signin_logs(user_id= db_user.id, logged_in = datetime.now())
                 access_token = create_access_token(data={"sub": str(db_user.id)}, expires_delta=expiry_del)
                 db_token = Token(user_id= db_user.id, token=access_token)
                 db.add(db_user)
@@ -46,8 +50,10 @@ class user_services:
                         "access_token": access_token, 
                         "token_type": "bearer"}
                     })
+            
             except Exception as e:
-               errorhandler(500, "Internal server error")
+               print(e)
+               errorhandler(500, f"Internal server error : {e}")
     
     def logoutUserservice(self,db, User_id):
           try:
@@ -57,16 +63,16 @@ class user_services:
                 list_signin = [i.id for i in signin_user]
                 last_login_id = max(list_signin)
                 last_login = filter_items(db,Signin_logs, Signin_logs.id,last_login_id).first()
-                last_login.logged_out = datetime.datetime.now()
+                last_login.logged_out = datetime.now()
                 db_token = filter_items(db,Token,Token.user_id,User_id).first()
                 db.add(last_login)
                 db.delete(db_token)
                 db.commit()
                 return JSONResponse({
-                        "message":"logged out"
+                        "message":"logged out successfully"
                 })
           except Exception as e:
-               errorhandler(500, "Internal server error")
+               errorhandler(500, f"Internal server error : {e}")
 
     def updateUserservice(self,db,user, username):
             try:
@@ -76,7 +82,7 @@ class user_services:
                 if user.name != "" and user.name != None:   
                     db_user.name = user.name
                 print(db_user.username)
-                db_user.updated_at = datetime.datetime.now()
+                db_user.updated_at = datetime.now()
                 db.commit()
                 return JSONResponse({
                     "user":{

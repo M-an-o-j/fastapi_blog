@@ -59,8 +59,9 @@ class blog_services:
 
         return db_blog
 
-    def deleteblogservice(self,db, blog_id):
+    def deleteblogservice(self,db, blog_id):                                                                            
         db_blog = db.query(self.blog).get(blog_id)
+        db_blog.title = True    
         db_blog.is_delete = True
         db.commit()
         return JSONResponse({
